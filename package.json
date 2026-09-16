@@ -1,0 +1,34 @@
+{
+  "name": "chroma-key-js",
+  "version": "1.0.0",
+  "description": "Dependency-free chroma keying (green screen removal) in the browser using YCbCr chroma distance, with edge feathering and spill suppression.",
+  "keywords": [
+    "chroma-key",
+    "green-screen",
+    "chromakey",
+    "background-removal",
+    "image-processing",
+    "canvas",
+    "browser",
+    "client-side",
+    "privacy"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "main": "src/chroma-key.js",
+  "module": "src/chroma-key.js",
+  "exports": {
+    ".": "./src/chroma-key.js"
+  },
+  "files": [
+    "src",
+    "demo",
+    "README.md",
+    "LICENSE"
+  ],
+  "homepage": "https://chromakeyremover.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chromakeyremover/chroma-key-js.git"
+  }
+}
