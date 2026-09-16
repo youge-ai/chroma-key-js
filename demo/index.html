@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>chroma-key-js — minimal demo</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #0f1115;
+            color: #e4e6eb;
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 32px 20px;
+            line-height: 1.6;
+        }
+        h1 { color: #4ade80; font-size: 1.4rem; }
+        .row { margin: 16px 0; }
+        label { display: inline-block; width: 130px; font-size: 0.9rem; color: #8b9099; }
+        input[type=range] { width: 200px; }
+        canvas {
+            max-width: 100%;
+            border-radius: 6px;
+            margin-top: 16px;
+            background-color: #555;
+            background-image:
+                linear-gradient(45deg, #333 25%, transparent 25%),
+                linear-gradient(-45deg, #333 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #333 75%),
+                linear-gradient(-45deg, transparent 75%, #333 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+        }
+        .hidden { display: none; }
+        a { color: #4ade80; }
+    </style>
+</head>
+<body>
+
+<h1>chroma-key-js demo</h1>
+<p>Drop in a green-screen image. Everything runs locally — no upload, no server.</p>
+
+<input type="file" id="file" accept="image/png,image/jpeg,image/webp">
+
+<div class="row">
+    <label for="key">Key colour</label>
+    <input type="color" id="key" value="#00b140">
+</div>
+<div class="row">
+    <label for="threshold">Threshold <span id="tv">35</span></label>
+    <input type="range" id="threshold" min="0" max="120" value="35">
+</div>
+<div class="row">
+    <label for="feather">Feather <span id="fv">2</span></label>
+    <input type="range" id="feather" min="0" max="15" value="2">
+</div>
+<div class="row">
+    <label for="despill">Despill <span id="dv">30</span></label>
+    <input type="range" id="despill" min="0" max="100" value="30">
+</div>
+
+<canvas id="out" class="hidden"></canvas>
+
+<script type="module">
+import { chromaKey } from '../src/chroma-key.js';
+
+const fileInput = document.getElementById('file');
+const canvas = document.getElementById('out');
+const ctx = canvas.getContext('2d');
+let sourceBitmap = null;
+
+const keyEl = document.getElementById('key');
+const thEl = document.getElementById('threshold');
+const feEl = document.getElementById('feather');
+const deEl = document.getElementById('despill');
+
+function render() {
+    if (!sourceBitmap) return;
+    document.getElementById('tv').textContent = thEl.value;
+    document.getElementById('fv').textContent = feEl.value;
+    document.getElementById('dv').textContent = deEl.value;
+
+    canvas.width = sourceBitmap.width;
+    canvas.height = sourceBitmap.height;
+    canvas.classList.remove('hidden');
+
+    ctx.drawImage(sourceBitmap, 0, 0);
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    chromaKey(imageData, keyEl.value, +thEl.value, +feEl.value, +deEl.value);
+    ctx.putImageData(imageData, 0, 0);
+}
+
+fileInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    sourceBitmap = await createImageBitmap(file);
+    render();
+});
+
+[keyEl, thEl, feEl, deEl].forEach((el) => el.addEventListener('input', render));
+</script>
+
+<p style="margin-top:32px; font-size:0.85rem; color:#6b7079;">
+    Full tool with batch processing, PNG export and eyedropper:
+    <a href="https://chromakeyremover.com">chromakeyremover.com</a>
+</p>
+
+</body>
+</html>
